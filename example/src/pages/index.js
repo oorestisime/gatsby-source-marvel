@@ -97,14 +97,14 @@ const MarvelPage = ({ data }) => (
 		>
 			<Anchor
 				target="_blank"
-				href="#"
+				href="https://www.npmjs.com/package/gatsby-source-marvel"
 				icon={<Install color="brand" size="large" />}
 				label={<Text size="large">Released on NPM</Text>}
 			/>
 			<Anchor
 				target="_blank"
 				a11yTitle="Share feedback on Github"
-				href="https://github.com/grommet/grommet"
+				href="https://github.com/oorestisime/gatsby-source-marvel"
 				icon={<Github color="brand" size="large" />}
 				label={<Text size="large">Code on Github</Text>}
 			/>
