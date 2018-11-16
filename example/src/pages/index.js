@@ -18,7 +18,13 @@ const GlobalTheme = createGlobalStyle`
 const queryExample = `
 \`\`\`
 allComicsNode(
-  filter: {characters : {elemMatch: {name: {in: ["Captain America", "Iron Man"]}}}}
+  filter: {
+    characters : {
+      elemMatch: {
+        name: {in: ["Captain America", "Iron Man"]}
+      }
+    }
+  }
 ) {
   edges {
     node {
@@ -206,7 +212,7 @@ const MarvelPage = ({ data }) => (
               <Paragraph>{character.node.description}</Paragraph>
             </Box>
             <Box pad="small" direction='row'>
-              <Image src={`${character.node.thumbnail.path}.${character.node.thumbnail.extension}`} fit="contain" />
+              <Image src={`${character.node.thumbnail.path.replace(/^http:\/\//i, 'https://')}.${character.node.thumbnail.extension}`} fit="contain" />
             </Box>
           </Box>
         </Box>
@@ -217,7 +223,7 @@ const MarvelPage = ({ data }) => (
         {data.allComicsNode.edges.map(comic => (
           <Box pad="medium">
             <Heading size="small">{`${comic.node.title} - ${comic.node.prices[0].price}$`}</Heading>
-            <Image src={`${comic.node.thumbnail.path}.${comic.node.thumbnail.extension}`} fit="contain"/>
+            <Image src={`${comic.node.thumbnail.path.replace(/^http:\/\//i, 'https://')}.${comic.node.thumbnail.extension}`} fit="contain"/>
             <Paragraph alignSelf="center" textAlign="center">
               <span>
                 {comic.node.characters.map(char => char.name ).join(', ')}
