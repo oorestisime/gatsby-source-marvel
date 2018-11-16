@@ -120,7 +120,7 @@ const MarvelPage = ({ data }) => (
       background="light-1"
       direction="row-responsive"
 		>
-      <Box margin="medium">
+      <Box basis="1/2" margin="medium">
         <Heading color="brand" size="medium">Configuration examples</Heading>
         <Paragraph size="medium" textAlign="left">
           <span>
@@ -143,7 +143,7 @@ const MarvelPage = ({ data }) => (
           </span>
         </Paragraph>
       </Box>
-      <Box margin="medium" wrap>
+      <Box basis="1/2" margin="medium">
         <Markdown>
           {configExample}
         </Markdown>
