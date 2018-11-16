@@ -1,7 +1,7 @@
 {
   "name": "gatsby-source-marvel",
   "description": "Gatsby source plugin pulling in data from the marvel API",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Orestis Ioannou <oorestisime@gmail.com>",
   "main": "index.js",
   "bugs": {
