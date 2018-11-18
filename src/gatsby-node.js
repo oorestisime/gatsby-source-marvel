@@ -1,80 +1,59 @@
-// TODO: handle errors
-// use url to construct urls
-// handle etag
-// process data into nodes
-// optionaly download thumbnails
-const _ = require(`lodash`)
-const axios = require(`axios`)
+const _ = require('lodash');
 const crypto = require('crypto');
 
-const { signRequest, processApiResult, paginateApi, findIds } = require('./api-helper');
-const { marvelAPI } = require('./constants');
+const {
+  marvelAPI, paginateApi, findIds, getEntityById,
+} = require('./api-helper');
 
 const defaultOptions = {
   limit: 100,
 };
 
-async function getEntityById({ entity, id, ...options }) {
-  const result = await axios.get(
-    `${marvelAPI}${entity}/${id}`,
-    {
-      params: {
-        ...signRequest(options),
-      },
-    },
-  );
-
-  return { id, entityResult: processApiResult(result).results[0] };
-}
-
-async function getEntitiesByFilter({ entity, entityFilter, ...options}) {
+async function getEntitiesByFilter({
+  cache, entity, entityFilter, ...options
+}) {
   const ids = await findIds({
-    ...options,
     entity,
+    cache,
     entityFilter,
+    ...options,
   });
 
-  return await Promise.all(ids.map(id => getEntityById({ entity, id, ...options })))
+  return await Promise.all(ids.map(id => getEntityById({
+    entity, id, cache, ...options,
+  })));
 }
 
-async function getEntityResourcesById({ entity, id, resource, limit, ...options }) {
+async function getEntityResourcesById({
+  entity, id, resource, cache, limit, ...options
+}) {
   return await paginateApi({
     route: `${marvelAPI}${entity}/${id}/${resource}`,
     limit,
+    cache,
     ...options,
-  })
+  });
 }
 
-// const filterEntity = (entity, fields) => _.pick(entity, fields);
-// const fitlerResults = (results, fields) => results.map(entity => filterEntity(entity, fields));
-
-const mergeResults = (entities, entity, result) => {
-  if (result.id in entities[entity]) {
-    entities[entity][result.id] = {...entities[entity][result.id], ...result};
-  } else {
-    entities[entity][result.id] = result;
-  }
-}
-
-function processEntities({ actions: { createNode }, entities, createNodeId, cache }) {
-  _.keys(entities).forEach(entity => _.values(entities[entity]).forEach(child => {
+function processEntities({ actions: { createNode }, entities }) {
+  _.keys(entities).forEach(entity => _.values(entities[entity]).forEach((child) => {
     createNode({
-      parent: `__SOURCE__`,
+      parent: '__SOURCE__',
       internal: {
         type: `${entity}Node`,
         contentDigest: crypto
-        .createHash(`md5`)
-        .update(JSON.stringify(child))
-        .digest(`hex`)
+          .createHash('md5')
+          .update(JSON.stringify(child))
+          .digest('hex'),
       },
       children: [],
       ...child,
       id: `${child.id}`,
-    })
-  }))
+    });
+  }));
 }
 
-async function runQueries({ queries, ...options}) {
+async function runQueries({ cache, queries, ...options }) {
   const entities = {
     characters: {},
     comics: {},
@@ -82,39 +61,52 @@ async function runQueries({ queries, ...options}) {
     events: {},
     creators: {},
   };
-  for(const { entity, entityFilter, resources } of queries) {
+  const mergeResults = (entity, result) => {
+    if (result.id in entities[entity]) {
+      entities[entity][result.id] = { ...entities[entity][result.id], ...result };
+    } else {
+      entities[entity][result.id] = result;
+    }
+  };
+  /* eslint-disable no-restricted-syntax */
+  for (const { entity, entityFilter, resources } of queries) {
     try {
       const filteredEntities = await getEntitiesByFilter({
+        cache,
         entity,
         entityFilter,
         ...options,
       });
+
       for (const filtered of filteredEntities) {
         if (!resources) {
-          mergeResults(entities, entity, filtered.entityResult);
+          mergeResults(entity, filtered.entityResult);
         } else {
           for (const resource of resources) {
             const resourceResult = await getEntityResourcesById({
-              ...options,
               entity,
-              id: filtered.id,
               resource,
+              cache,
+              id: filtered.id,
+              ...options,
             });
             filtered.entityResult[`${resource}___NODE`] = resourceResult.map(res => `${res.id}`);
-            mergeResults(entities, entity, filtered.entityResult);
-            resourceResult.forEach(res => mergeResults(entities, resource, res ));
-          };
+            mergeResults(entity, filtered.entityResult);
+            resourceResult.forEach(res => mergeResults(resource, res));
+          }
         }
       }
     } catch (err) {
-      console.warn("Something went wrong querying Marvel", err)
+      console.warn('Something went wrong querying Marvel', err); // eslint-disable-line no-console
     }
-  };
+  }
+  /* eslint-enable no-restricted-syntax */
+
   return entities;
 }
 
-exports.sourceNodes = async ({ actions, store, cache, createNodeId }, options) => {
+exports.sourceNodes = async ({ actions, cache }, options) => {
   const pluginOptions = { ...defaultOptions, ...options };
-  const entities = await runQueries({ queries: pluginOptions.queries, ...options });
-  processEntities({ actions, cache, createNodeId, entities });
-}
+  const entities = await runQueries({ cache, queries: pluginOptions.queries, ...options });
+  processEntities({ actions, entities });
+};

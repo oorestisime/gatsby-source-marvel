@@ -33,3 +33,5 @@ coverage
 decls
 example
 .vscode
+netlify.toml
+.eslintrc.js

@@ -6,6 +6,7 @@ module.exports = {
   },
   plugins: [
     {
+      // resolve: require.resolve('..'), // Used at dev
       resolve: 'gatsby-source-marvel',
       options: {
         publicKey: process.env.PUBKEY,
@@ -27,7 +28,7 @@ module.exports = {
             resources: ['characters'],
           },
         ],
-      }
+      },
     },
   ],
-}
+};

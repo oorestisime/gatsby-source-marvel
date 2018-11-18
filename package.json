@@ -1,7 +1,7 @@
 {
   "name": "gatsby-source-marvel",
   "description": "Gatsby source plugin pulling in data from the marvel API",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "author": "Orestis Ioannou <oorestisime@gmail.com>",
   "main": "index.js",
   "bugs": {
@@ -11,21 +11,19 @@
     "@babel/preset-env": "^7.0.0",
     "@babel/runtime": "^7.0.0",
     "axios": "^0.18.0",
+    "lodash": "^4.17.11",
     "node-fetch": "^2.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
+    "babel-eslint": "^8.2.3",
     "cross-env": "^5.1.4",
     "eslint": "^4.19.1",
-    "eslint-config-google": "^0.9.1",
-    "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-flow-vars": "^0.5.0",
-    "eslint-plugin-flowtype": "^2.46.1",
-    "eslint-plugin-import": "^2.9.0",
-    "eslint-plugin-jsx-a11y": "^6.0.2",
-    "eslint-plugin-prettier": "^2.6.0",
-    "eslint-plugin-react": "^7.7.0"
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.11.1"
   },
   "homepage": "https://github.com/oorestisime/gatsby-source-marvel",
   "keywords": [
